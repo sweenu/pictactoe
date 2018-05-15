@@ -97,14 +97,14 @@ def has_win(player):
         for x in [0, 24, 48]:
             if w[x] == w[x + 3] == w[x + 6] != [0, 0, 0]:
                 s.show_message(
-                    "Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.01
+                    "Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.1
                     )
                 return True
         # colonnes
         for x in [0, 3, 6]:
             if w[x] == w[x + 24] == w[x + 48] != [0, 0, 0]:
                 s.show_message(
-                    "Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.01
+                    "Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.1
                     )
                 return True
 
@@ -112,7 +112,7 @@ def has_win(player):
         if (w[0] == w[27] == w[54] != [0, 0, 0] or
                 w[6] == w[27] == w[48] != [0, 0, 0]):
             s.show_message(
-                "Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.01
+                "Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.1
                 )
             return True
 
@@ -121,21 +121,21 @@ def has_win(player):
         for y in [0, 24, 48]:
             if w[y] == w[y + 3] == w[y + 6] != [0, 0, 0]:
                 s.show_message(
-                    "Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.01
+                    "Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.1
                     )
                 return True
         # colonnes
         for y in [0, 3, 6]:
             if w[y] == w[y + 24] == w[y + 48] != [0, 0, 0]:
                 s.show_message(
-                    "Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.01
+                    "Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.1
                     )
                 return True
         # diagonales
         if (w[0] == w[27] == w[54] != [0, 0, 0] or
                 w[6] == w[27] == w[48] != [0, 0, 0]):
             s.show_message(
-                "Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.01
+                "Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.1
                 )
             return True
 
@@ -143,7 +143,7 @@ def has_win(player):
 def begin():
     s.show_message(
         "Welcome to pytictactoe !!",
-        text_colour=[255, 255, 0], back_colour=[0, 255, 0], scroll_speed=0.01)
+        text_colour=[255, 255, 0], back_colour=[0, 255, 0], scroll_speed=0.1)
     s.stick.wait_for_event()
 
 
@@ -260,7 +260,7 @@ def play():
                     elif id == 2:
                         id = 1
 
-    s.show_message("Draw game", text_colour=[255, 255, 0], scroll_speed=0.01)
+    s.show_message("Draw game", text_colour=[255, 255, 0], scroll_speed=0.1)
 
 
 # il faut faire plus propre ici mamène
