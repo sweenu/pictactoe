@@ -139,8 +139,8 @@ def has_win(player):
 def begin():
     s.show_message(
         "Welcome to pytictactoe !!",
-        text_colour=[255, 255, 0],
-        back_colour=[0, 255, 0],
+        text_colour=white,
+        back_colour=pink,
         scroll_speed=0.1,
     )
     s.stick.wait_for_event()
