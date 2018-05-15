@@ -1,5 +1,7 @@
 from sense_hat import *
 from time import *
+import os
+
 
 s = SenseHat()
 s.low_light = True
@@ -98,19 +100,19 @@ def has_win(player):
         for x in [0, 24, 48]:
             if w[x] == w[x + 3] == w[x + 6] != [0, 0, 0]:
                 s.show_message(
-                    "Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.01
+                    "Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.1
                 )
                 return True
         # colonnes
         for x in [0, 3, 6]:
             if w[x] == w[x + 24] == w[x + 48] != [0, 0, 0]:
                 s.show_message(
-                    "Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.01
+                    "Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.1
                 )
                 return True
         # diagonales
         if w[0] == w[27] == w[54] != [0, 0, 0] or w[6] == w[27] == w[48] != [0, 0, 0]:
-            s.show_message("Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.01)
+            s.show_message("Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.1)
             return True
 
     if player == 1:
@@ -118,19 +120,19 @@ def has_win(player):
         for y in [0, 24, 48]:
             if w[y] == w[y + 3] == w[y + 6] != [0, 0, 0]:
                 s.show_message(
-                    "Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.01
+                    "Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.1
                 )
                 return True
         # colonnes
         for y in [0, 3, 6]:
             if w[y] == w[y + 24] == w[y + 48] != [0, 0, 0]:
                 s.show_message(
-                    "Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.01
+                    "Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.1
                 )
                 return True
         # diagonales
         if w[0] == w[27] == w[54] != [0, 0, 0] or w[6] == w[27] == w[48] != [0, 0, 0]:
-            s.show_message("Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.01)
+            s.show_message("Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.1)
             return True
 
 
@@ -139,7 +141,7 @@ def begin():
         "Welcome to pytictactoe !!",
         text_colour=[255, 255, 0],
         back_colour=[0, 255, 0],
-        scroll_speed=0.01,
+        scroll_speed=0.1,
     )
     s.stick.wait_for_event()
 
@@ -240,7 +242,7 @@ def play():
                             Bsquare(x, y)
                             pc.append([x, y])
                             if has_win(id):
-                                break
+                                os.exit()
                             tour = tour + 1
                             x, y = 3, 3
                             Wsquare(x, y)
@@ -248,7 +250,7 @@ def play():
                             Rsquare(x, y)
                             pc2.append([x, y])
                             if has_win(id):
-                                break
+                                os.exit()
                             tour = tour + 1
                             x, y = 3, 3
                             Wsquare(x, y)
@@ -257,7 +259,7 @@ def play():
                     elif id == 2:
                         id = 1
 
-    s.show_message("Draw game", text_colour=[255, 255, 0], scroll_speed=0.01)
+    s.show_message("Draw game", text_colour=[255, 255, 0], scroll_speed=0.1)
 
 
 begin()
