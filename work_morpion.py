@@ -2,6 +2,7 @@ from sense_hat import *
 from time import *
 
 s = SenseHat()
+s.low_light = True
 
 green = (0, 255, 0)
 yellow = (255, 255, 0)
