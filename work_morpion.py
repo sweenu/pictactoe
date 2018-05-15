@@ -1,6 +1,6 @@
 from sense_hat import *
 from time import *
-import os
+import sys
 
 
 s = SenseHat()
@@ -242,7 +242,7 @@ def play():
                             Bsquare(x, y)
                             pc.append([x, y])
                             if has_win(id):
-                                os.exit()
+                                sys.exit()
                             tour = tour + 1
                             x, y = 3, 3
                             Wsquare(x, y)
@@ -250,7 +250,7 @@ def play():
                             Rsquare(x, y)
                             pc2.append([x, y])
                             if has_win(id):
-                                os.exit()
+                                sys.exit()
                             tour = tour + 1
                             x, y = 3, 3
                             Wsquare(x, y)
