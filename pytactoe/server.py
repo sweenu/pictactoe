@@ -1,14 +1,13 @@
-import socket
+from sockerserver import TCPServer, BaseRequestHandler
 
-HOST = ''
-PORT = 47878
-with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
-    s.bind((HOST, PORT))
-    s.listen(1)
-    conn, addr = s.accept()
-    with conn:
-        print('Connected by', addr)
-        while True:
-            data = conn.recv(1024)
-            if not data: break
-            conn.sendall(data)
+class MyTCPHandler(BaseRequestHandler):
+  def handle(self):
+        data = self.request.recv().strip()
+        print("{} wrote:".format(self.client_address[0]))
+        print(data)
+        self.request.sendall(self.data.upper())
+
+
+def serve(port, host=''):
+    with TCPServer((host, port), MyTCPHandler) as s:
+        s.serve_forever()

@@ -1,95 +1,80 @@
-from sense_hat import *
-from time import *
 import sys
+from time import sleep
 
+from sense_hat import SenseHat
+
+
+colors = {
+            'blank':   (0,   0,   0),
+            'white':   (255, 255, 255),
+            'red':     (255, 0,   0),
+            'green':   (0,   255, 0),
+            'blue':    (0,   0,   255),
+            'yellow':  (255, 255, 0),
+            'pink':    (255, 105, 180)
+        }
 
 s = SenseHat()
 s.low_light = True
 
-green = (0, 255, 0)
-yellow = (255, 255, 0)
-blue = (0, 0, 255)
-red = (255, 0, 0)
-white = (255, 255, 255)
-nothing = (0, 0, 0)
-pink = (255, 105, 180)
+
+class Tile:
+    def __init__(self, nb):
+        x = (nb % 3) * 3
+        y = (nb // 3) * 3
+        self.coords = {(x, y), (x + 1, y), (x, y + 1), (x + 1, y + 1)}
+
+    def draw(self, color):
+        for x, y in self.coords:
+            s.set_pixel(x, y, color)
 
 
-def drawGrid():
-    W = white
-    O = nothing
-    grid = [
-        O, O, W, O, O, W, O, O,
-        O, O, W, O, O, W, O, O,
-        W, W, W, W, W, W, W, W,
-        O, O, W, O, O, W, O, O,
-        O, O, W, O, O, W, O, O,
-        W, W, W, W, W, W, W, W,
-        O, O, W, O, O, W, O, O,
-        O, O, W, O, O, W, O, O,
-    ]
-    return grid
+class Grid():
+    def __init__(self, color):
+        self.color = color
+
+    def draw(self):
+        X = self.color
+        O = colors['blank']
+        grid = [
+            O, O, X, O, O, X, O, O,
+            O, O, X, O, O, X, O, O,
+            X, X, X, X, X, X, X, X,
+            O, O, X, O, O, X, O, O,
+            O, O, X, O, O, X, O, O,
+            X, X, X, X, X, X, X, X,
+            O, O, X, O, O, X, O, O,
+            O, O, X, O, O, X, O, O,
+        ]
+        set_pixels(grid)
+
+class Player:
+    def __init__(self, color):
+        self.color = color
+        self.tiles = set()
+
+    def draw(self):
+        for tile in self.tiles:
+            tile.draw(self.color)
+
+    def add_tile(self, tile):
+        self.tiles.add(tile)
 
 
-def Wsquare(posx, posy):
-    x = posx
-    y = posy
-    s.set_pixel(x, y, (255, 255, 255))
-    s.set_pixel(x + 1, y, (255, 255, 255))
-    s.set_pixel(x + 1, y + 1, (255, 255, 255))
-    s.set_pixel(x, y + 1, (255, 255, 255))
+class Game:
+    def __init__(self, tile_color, selection_color):
+        self.grid = Grid(colors['white'])
+        self.tile_color = tile_color
+        self.selection_color = selection_color
+        self.tiles = [Tile(i) for i in range(9)]
+        self.selection = tiles[4]
+        self.players = (Player(colors['blue']), Player(colors['red']))
+        
+    def start(self):
+        self.grid.draw()
+        self.selection.draw()
 
 
-def Bsquare(posx, posy):
-    x = posx
-    y = posy
-    s.set_pixel(x, y, (0, 0, 255))
-    s.set_pixel(x + 1, y, (0, 0, 255))
-    s.set_pixel(x + 1, y + 1, (0, 0, 255))
-    s.set_pixel(x, y + 1, (0, 0, 255))
-
-
-def Rsquare(posx, posy):
-    x = posx
-    y = posy
-    s.set_pixel(x, y, (255, 0, 0))
-    s.set_pixel(x + 1, y, (255, 0, 0))
-    s.set_pixel(x + 1, y + 1, (255, 0, 0))
-    s.set_pixel(x, y + 1, (255, 0, 0))
-
-
-def EmptySquare(posx, posy):
-    x = posx
-    y = posy
-    s.set_pixel(x, y, (0, 0, 0))
-    s.set_pixel(x + 1, y, (0, 0, 0))
-    s.set_pixel(x + 1, y + 1, (0, 0, 0))
-    s.set_pixel(x, y + 1, (0, 0, 0))
-
-
-def Ysquare(posx, posy):
-    x = posx
-    y = posy
-    s.set_pixel(x, y, (255, 255, 0))
-    s.set_pixel(x + 1, y, (255, 255, 0))
-    s.set_pixel(x + 1, y + 1, (255, 255, 0))
-    s.set_pixel(x, y + 1, (255, 255, 0))
-
-
-def ErrorCell(posx, posy):
-    x = posx
-    y = posy
-    Ysquare(x, y)
-    sleep(.1)
-    Wsquare(x, y)
-    sleep(.1)
-    Ysquare(x, y)
-    sleep(.1)
-    Wsquare(x, y)
-    sleep(.1)
-    Ysquare(x, y)
-    sleep(.1)
-    Wsquare(x, y)
 
 
 def has_win(player):
