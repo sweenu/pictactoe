@@ -1,9 +1,7 @@
-import sys
-from time import sleep
-
 from sense_hat import SenseHat
 
 
+SCROLL_SPEED = 0.1
 colors = {
             'blank':   (0,   0,   0),
             'white':   (255, 255, 255),
@@ -20,14 +18,51 @@ s.low_light = True
 
 class Tile:
     def __init__(self, nb):
-        x = (nb % 3) * 3
-        y = (nb // 3) * 3
-        self.coords = {(x, y), (x + 1, y), (x, y + 1), (x + 1, y + 1)}
+        self.nb = nb
 
-    def draw(self, color):
-        for x, y in self.coords:
+    @property
+    def coords(self):
+        x = (self.nb % 3) * 3
+        y = (self.nb // 3) * 3
+        return {(x, y), (x + 1, y), (x, y + 1), (x + 1, y + 1)}
+
+    @staticmethod
+    def _draw(coords, color):
+        for x, y in coords:
             s.set_pixel(x, y, color)
 
+    def draw(self, color):
+        self._draw(self.coords, color)
+
+
+class Cursor(Tile):
+    def __init__(self, color):
+        self.color = color
+
+    def draw(self):
+        self._draw(self.coords, self.color)
+
+    def place(self, nb):
+        self.nb = nb
+
+    def move(self, direction):
+        if direction == 'up':
+            nb = self.nb - 3
+            if not nb < 0:
+                self.nb = nb
+        elif direction == 'down':
+            nb = self.nb + 3
+            if not nb > 8:
+                self.nb = nb
+        elif direction == 'left':
+            nb = self.nb - 1
+            if nb not in {-1, 2, 5}:
+                self.nb = nb
+        elif direction == 'right':
+            nb = self.nb + 1
+            if nb not in {3, 6, 9}:
+                self.nb = nb
+            
 
 class Grid():
     def __init__(self, color):
@@ -46,7 +81,8 @@ class Grid():
             O, O, X, O, O, X, O, O,
             O, O, X, O, O, X, O, O,
         ]
-        set_pixels(grid)
+        s.set_pixels(grid)
+
 
 class Player:
     def __init__(self, color):
@@ -60,193 +96,72 @@ class Player:
     def add_tile(self, tile):
         self.tiles.add(tile)
 
+    def has_win(self):
+        tile_numbers = {tile.nb for tile in self.tiles}
+        win_combinations = [{0, 3, 6}, {1, 4, 7}, {2, 5, 8}, # lines
+                            {0, 1, 2}, {3, 4 ,5}, {6, 7 ,8}, # columns
+                            {0, 4, 8}, {2, 4, 6}] # diagonales
+        return any(combi.issubset(tile_numbers) for combi in win_combinations)
+
 
 class Game:
-    def __init__(self, tile_color, selection_color):
+    def __init__(self, cursor_color):
         self.grid = Grid(colors['white'])
-        self.tile_color = tile_color
-        self.selection_color = selection_color
+        self.cursor = Cursor(cursor_color)
         self.tiles = [Tile(i) for i in range(9)]
-        self.selection = tiles[4]
         self.players = (Player(colors['blue']), Player(colors['red']))
-        
+
+    @property
+    def used_tiles(self):
+        return self.players[0].tiles.union(self.players[1].tiles)
+
+    def _refresh(self):
+        for player in self.players:
+            player.draw()
+
+        for unused_tile in set(self.tiles).difference(self.used_tiles):
+            unused_tile.draw(colors['blank'])
+
+        self.cursor.draw()
+
     def start(self):
+        s.show_message(
+            "Welcome to pytactoe !!",
+            text_colour=colors['white'],
+            scroll_speed=SCROLL_SPEED,
+        )
         self.grid.draw()
-        self.selection.draw()
+        self.cursor.place(4)
+        self.cursor.draw()
 
+        turn = 0
+        while turn < 9:
+            player = self.players[turn % 2]
 
-
-
-def has_win(player):
-    w = s.get_pixels()
-
-    if player == 2:
-        # lignes
-        for x in [0, 24, 48]:
-            if w[x] == w[x + 3] == w[x + 6] != [0, 0, 0]:
-                s.show_message(
-                    "Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.1
-                )
-                return True
-        # colonnes
-        for x in [0, 3, 6]:
-            if w[x] == w[x + 24] == w[x + 48] != [0, 0, 0]:
-                s.show_message(
-                    "Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.1
-                )
-                return True
-        # diagonales
-        if w[0] == w[27] == w[54] != [0, 0, 0] or w[6] == w[27] == w[48] != [0, 0, 0]:
-            s.show_message("Player 2 win", text_colour=[255, 0, 0], scroll_speed=0.1)
-            return True
-
-    if player == 1:
-        # lignes
-        for y in [0, 24, 48]:
-            if w[y] == w[y + 3] == w[y + 6] != [0, 0, 0]:
-                s.show_message(
-                    "Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.1
-                )
-                return True
-        # colonnes
-        for y in [0, 3, 6]:
-            if w[y] == w[y + 24] == w[y + 48] != [0, 0, 0]:
-                s.show_message(
-                    "Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.1
-                )
-                return True
-        # diagonales
-        if w[0] == w[27] == w[54] != [0, 0, 0] or w[6] == w[27] == w[48] != [0, 0, 0]:
-            s.show_message("Player 1 win", text_colour=[0, 0, 255], scroll_speed=0.1)
-            return True
-
-
-def begin():
-    s.show_message(
-        "Welcome to pytictactoe !!",
-        text_colour=white,
-        back_colour=pink,
-        scroll_speed=0.1,
-    )
-    s.stick.wait_for_event()
-
-
-def play():
-    id = 1
-    x, y = 3, 3
-    Wsquare(x, y)
-    pc = []
-    pc2 = []
-    tour = 1
-
-    while tour <= 9:
-        for event in s.stick.get_events():
-            if event.direction == "up" and event.action == "pressed":
-                if y == 0:
-                    pass
-                else:
-                    if pc.count([x, y]) == 1:
-                        Bsquare(x, y)
-                        y = y - 3
-                        Wsquare(x, y)
-                    elif pc2.count([x, y]) == 1:
-                        Rsquare(x, y)
-                        y = y - 3
-                        Wsquare(x, y)
+            played = False
+            while not played:
+                event = s.stick.wait_for_event()
+                if event.action == 'pressed':
+                    if not event.direction == 'middle':
+                        self.cursor.move(event.direction)
+                        self._refresh()
+                        self.cursor.draw()
                     else:
-                        EmptySquare(x, y)
-                        y = y - 3
-                        Wsquare(x, y)
+                        if not self.cursor.nb in self.used_tiles:
+                            player.add_tile(self.tiles[self.cursor.nb])
+                            self.cursor.place(4)
+                            self._refresh()
+                            played = True
 
-            if event.direction == "down" and event.action == "pressed":
-                if y == 6:
-                    pass
-                else:
-                    if pc.count([x, y]) == 1:
-                        Bsquare(x, y)
-                        y = y + 3
-                        Wsquare(x, y)
-                    elif pc2.count([x, y]) == 1:
-                        Rsquare(x, y)
-                        y = y + 3
-                        Wsquare(x, y)
-                    else:
-                        EmptySquare(x, y)
-                        y = y + 3
-                        Wsquare(x, y)
+            if turn > 2:
+                if player.has_win():
+                    s.show_message("You win!",
+                                   text_colour=player.color,
+                                   scroll_speed=SCROLL_SPEED)
+                    return
 
-            if event.direction == "left" and event.action == "pressed":
-                if x == 0:
-                    pass
-                else:
-                    if pc.count([x, y]) == 1:
-                        Bsquare(x, y)
-                        x = x - 3
-                        Wsquare(x, y)
-                    elif pc2.count([x, y]) == 1:
-                        Rsquare(x, y)
-                        x = x - 3
-                        Wsquare(x, y)
-                    else:
-                        EmptySquare(x, y)
-                        x = x - 3
-                        Wsquare(x, y)
+            turn += 1
 
-            if event.direction == "right" and event.action == "pressed":
-                if x == 6:
-                    pass
-                else:
-                    if pc.count([x, y]) == 1:
-                        Bsquare(x, y)
-                        x = x + 3
-                        Wsquare(x, y)
-                    elif pc2.count([x, y]) == 1:
-                        Rsquare(x, y)
-                        x = x + 3
-                        Wsquare(x, y)
-                    else:
-                        EmptySquare(x, y)
-                        x = x + 3
-                        Wsquare(x, y)
-
-            if event.direction == "middle" and event.action == "pressed":
-                if pc.count([x, y]) == 1 or pc2.count([x, y]) == 1:
-                    ErrorCell(x, y)
-                else:
-                    if x == 3 and y == 3:
-                        if id == 1:
-                            Bsquare(x, y)
-                            pc.append([x, y])
-                            tour = tour + 1
-                        if id == 2:
-                            Rsquare(x, y)
-                            pc2.append([x, y])
-                            tour = tour + 1
-                    else:
-                        if id == 1:
-                            Bsquare(x, y)
-                            pc.append([x, y])
-                            if has_win(id):
-                                sys.exit()
-                            tour = tour + 1
-                            x, y = 3, 3
-                            Wsquare(x, y)
-                        if id == 2:
-                            Rsquare(x, y)
-                            pc2.append([x, y])
-                            if has_win(id):
-                                sys.exit()
-                            tour = tour + 1
-                            x, y = 3, 3
-                            Wsquare(x, y)
-                    if id == 1:
-                        id = 2
-                    elif id == 2:
-                        id = 1
-
-    s.show_message("Draw game", text_colour=[255, 255, 0], scroll_speed=0.1)
-
-
-begin()
-s.set_pixels(drawGrid())
-play()
+        s.show_message("Draw!",
+                       text_colour=colors['white'],
+                       scroll_speed=SCROLL_SPEED)
