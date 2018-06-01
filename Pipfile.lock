@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "f190c2ae5ef2e2b44e01fc4976bae29b9387bffe7828468e3400df0281abca3f"
+            "sha256": "d28a7a4a2455a18b6b01e103d435d1efeb38d158679139f5371b8fbf5aa69fb0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -91,6 +91,26 @@
                 "sha256:fe6931db24716a0845bd8c8915bd096b77c2a7043e6fc59ae9ca364fe816f08b"
             ],
             "version": "==5.1.0"
+        },
+        "pycairo": {
+            "hashes": [
+                "sha256:cdd4d1d357325dec3a21720b85d273408ef83da5f15c184f2eff3212ff236b9f"
+            ],
+            "version": "==1.17.0"
+        },
+        "pygobject": {
+            "hashes": [
+                "sha256:250fb669b6ac64eba034cc4404fcbcc993717b1f77c29dff29f8c9202da20d55"
+            ],
+            "index": "pypi",
+            "version": "==3.28.3"
+        },
+        "sense-emu": {
+            "hashes": [
+                "sha256:d39848e6a8fa4cfba154a72793d8138442ebbd1fe873965d982f23a7a9877f95"
+            ],
+            "index": "pypi",
+            "version": "==1.0"
         },
         "sense-hat": {
             "hashes": [

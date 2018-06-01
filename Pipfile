@@ -5,6 +5,8 @@ name = "pypi"
 
 [packages]
 sense-hat = "*"
+sense-emu = "*"
+pygobject = "*"
 
 [dev-packages]
 
