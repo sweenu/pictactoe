@@ -107,6 +107,7 @@ class Game:
         self.tiles = [GameTile(i) for i in range(9)]
 
         self.player_nb = player_nb
+
         self.players = [Player(colors['blue']), Player(colors['red'])]
 
     @property
@@ -116,13 +117,11 @@ class Game:
 
     @property
     def turn(self):
-        return 8 - len([tile for tile in self.tiles if tile.used])
+        return 9 - len([tile for tile in self.tiles if not tile.used])
     
-
     def refresh(self):
         for tile in self.tiles:
-            for led in tile.coords:
-                self.sense.set_pixel(led[0], led[1], tile.color)
+            self._draw_tile(tile)
 
     def _draw_tile(self, tile):
         for led in tile.coords:
@@ -161,12 +160,7 @@ class Game:
                     self.loose_msg()
                     break
                 else:
-                    selected_tile = self.tiles[tile_nb]
-                    if self.players[1] is self.current_player:
-                        opponent = self.players[0]
-                    else:
-                        opponent = self.players[1]
-                    opponent.play(selected_tile)
+                    self.current_player.play(self.tiles[tile_nb])
                     self.refresh()
                     break
 
