@@ -111,7 +111,7 @@ class Game:
 
     @property
     def current_player(self):
-        nb = (self.turn % 2) + 1 * self.player_nb
+        nb = (self.turn % 2)
         return self.players[nb]
 
     @property
@@ -159,6 +159,7 @@ class Game:
                 tile_nb = int.from_bytes(data, 'little')
                 if tile_nb == 9:
                     self.loose_msg()
+                    break
                 else:
                     selected_tile = self.tiles[tile_nb]
                     if self.players[1] is self.current_player:
@@ -167,6 +168,7 @@ class Game:
                         opponent = self.players[1]
                     opponent.play(selected_tile)
                     self.refresh()
+                    break
 
     def intro_msg(self):
         self.sense.show_message(

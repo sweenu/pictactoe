@@ -3,7 +3,8 @@ import os
 import sys
 from argparse import ArgumentParser
 
-import server
+from .server import serve
+from .client import connect
 
 
 def main():
@@ -12,21 +13,18 @@ def main():
     parser.add_argument('-c', '--connect',
                         help="the host's ip address")
     parser.add_argument('-H', '--host',
-                        help="start a server and wait for a player to connect")
+                        help="start a server and wait for a player to connect",
+                        action='store_true')
     args = parser.parse_args()
 
     if args.host:
         if args.connect:
             print('Cannot both host and connect to another host')
             sys.exit(1)
-        if os.fork() == 0:
-            Game().start()
         else:
-            server.serve()        
-    else:
-        if args.connect:
-            Game(host=args.connect)
-        Game().start()
+            serve()        
+    elif args.connect:
+        connect(args.connect)
 
 
 if __name__ == '__main__':
