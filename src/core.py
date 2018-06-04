@@ -142,13 +142,13 @@ class Game:
                     selected_tile = self.tiles[self.cursor.nb]
                     if not selected_tile.used:
                         self.current_player.play(selected_tile)
-                        if turn > 2:
+                        if self.turn > 2:
                             if self.current_player.has_win():
                                 self.win_msg()
-                                socket.sendall(-1)
+                                socket.sendall(bytes([9]))
                                 break
 
-                        socket.sendall(self.cursor.nb)
+                        socket.sendall(bytes([self.cursor.nb]))
                         self.refresh()
                         break
 
@@ -156,17 +156,17 @@ class Game:
         while True:
             data = socket.recv(1024)
             if data:
-                tile_nb = int(data)
-                if data == -1:
+                tile_nb = int.from_bytes(data, 'little')
+                if tile_nb == 9:
                     self.loose_msg()
                 else:
-                    selected_tile = self.tiles[data]
+                    selected_tile = self.tiles[tile_nb]
                     if self.players[1] is self.current_player:
                         opponent = self.players[0]
                     else:
                         opponent = self.players[1]
                     opponent.play(selected_tile)
-                    self.refresh(tiles)
+                    self.refresh()
 
     def intro_msg(self):
         self.sense.show_message(
