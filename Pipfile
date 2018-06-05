@@ -5,10 +5,10 @@ name = "pypi"
 
 [packages]
 sense-hat = "*"
+
+[dev-packages]
 sense-emu = "*"
 pygobject = "*"
 
-[dev-packages]
-
 [requires]
-python_version = "3.6"
+python_version = "3.5"

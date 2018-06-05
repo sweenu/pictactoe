@@ -143,10 +143,10 @@ class Game:
                     selected_tile = self.tiles[self.cursor.nb]
                     if not selected_tile.used:
                         self.current_player.play(selected_tile)
-                        if self.turn > 2:
+                        if self.turn > 3:
                             if self.current_player.has_win():
-                                self.win_msg()
                                 socket.sendall(bytes([9]))
+                                self.win_msg()
                                 return True
 
                         socket.sendall(bytes([self.cursor.nb]))
