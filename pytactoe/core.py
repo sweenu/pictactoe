@@ -113,6 +113,11 @@ class Game:
     @property
     def current_player(self):
         nb = self.turn % 2
+        return self.players[nb]
+
+    @property
+    def other_player(self):
+        nb = self.turn % 2
         return self.players[nb^1]
 
     @property
@@ -141,9 +146,9 @@ class Game:
                 else:
                     selected_tile = self.tiles[self.cursor.nb]
                     if selected_tile.color == colors['blank']:
-                        self.current_player.play(selected_tile)
+                        self.current_player.play(selected_tile) # the turn is incremented here
                         if self.turn > 3:
-                            if self.current_player.has_win():
+                            if self.other_player.has_win():
                                 socket.sendall(bytes([9]))
                                 self.win_msg()
                                 return True
