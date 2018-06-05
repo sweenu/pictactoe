@@ -1,7 +1,7 @@
 from sense_hat import SenseHat
 
 
-SCROLL_SPEED = 0.1
+SCROLL_SPEED = 0.04
 colors = {
             'blank':   (0,   0,   0),
             'white':   (255, 255, 255),
@@ -23,7 +23,6 @@ class GameTile(Tile):
     def __init__(self, nb):
         self.nb = nb
         self.color = colors['blank']
-        self.used = False
 
 class Cursor(Tile):
     def __init__(self, color):
@@ -84,7 +83,6 @@ class Player:
 
     def play(self, tile):
         tile.color = self.color
-        tile.used = True
         self._add_tile(tile)
 
     def has_win(self):
@@ -114,12 +112,13 @@ class Game:
 
     @property
     def current_player(self):
-        nb = (self.turn % 2)
-        return self.players[nb]
+        nb = self.turn % 2
+        return self.players[nb^1]
 
     @property
     def turn(self):
-        return 9 - len([tile for tile in self.tiles if not tile.used])
+        nb_used_tiles = len(self.players[0].tiles) + len(self.players[1].tiles)
+        return nb_used_tiles
     
     def refresh(self):
         for tile in self.tiles:
@@ -141,7 +140,7 @@ class Game:
                     self._draw_tile(self.cursor)
                 else:
                     selected_tile = self.tiles[self.cursor.nb]
-                    if not selected_tile.used:
+                    if selected_tile.color == colors['blank']:
                         self.current_player.play(selected_tile)
                         if self.turn > 3:
                             if self.current_player.has_win():
@@ -154,9 +153,6 @@ class Game:
                         return False
 
     def wait_for_play(self, socket):
-        print('{}'.format(self.turn))
-        for tile in self.current_player.tiles:
-            print('{}, {}'.format(tile.nb, tile.color))
         while True:
             data = socket.recv(1024)
             if data:
