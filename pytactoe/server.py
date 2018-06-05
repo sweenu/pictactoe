@@ -12,9 +12,12 @@ def serve(host='', port=47878):
         conn, _ = s.accept()
         with conn:
             while True:
-                game.wait_for_play(conn)            
                 if game.turn < 9:
-                    game.play(conn)
+                    if game.wait_for_play(conn):
+                        break
+                if game.turn < 9:
+                    if game.play(conn):
+                        break
                 else:
                     game.draw_msg()
                     break

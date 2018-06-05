@@ -1,4 +1,4 @@
-from sense_emu import SenseHat
+from sense_hat import SenseHat
 
 
 SCROLL_SPEED = 0.1
@@ -100,6 +100,8 @@ class Game:
         self.sense = SenseHat()
         self.sense.low_light = True
 
+        self.intro_msg()
+
         self.grid = Grid(colors['white'])
         self.sense.set_pixels(self.grid)
 
@@ -145,11 +147,11 @@ class Game:
                             if self.current_player.has_win():
                                 self.win_msg()
                                 socket.sendall(bytes([9]))
-                                break
+                                return True
 
                         socket.sendall(bytes([self.cursor.nb]))
                         self.refresh()
-                        break
+                        return False
 
     def wait_for_play(self, socket):
         while True:
@@ -158,11 +160,11 @@ class Game:
                 tile_nb = int.from_bytes(data, 'little')
                 if tile_nb == 9:
                     self.loose_msg()
-                    break
+                    return True
                 else:
                     self.current_player.play(self.tiles[tile_nb])
                     self.refresh()
-                    break
+                    return False
 
     def intro_msg(self):
         self.sense.show_message(

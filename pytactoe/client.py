@@ -10,8 +10,11 @@ def connect(host, port=47878):
         
         while True:
             if game.turn < 9:
-                game.play(s)
-                game.wait_for_play(s)
+                if game.play(s):
+                    break
+            if game.turn < 9:
+                if game.wait_for_play(s):
+                    break
             else:
                 game.draw_msg()
                 break
