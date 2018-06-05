@@ -154,6 +154,9 @@ class Game:
                         return False
 
     def wait_for_play(self, socket):
+        print('{}'.format(self.turn))
+        for tile in self.current_player.tiles:
+            print('{}, {}'.format(tile.nb, tile.color))
         while True:
             data = socket.recv(1024)
             if data:
