@@ -5,7 +5,11 @@ name = "pypi"
 
 [packages]
 sense-hat = "*"
+rtimulib
 
 [dev-packages]
 sense-emu = "*"
 pygobject = "*"
+
+[requires]
+python_version = "3.5"
