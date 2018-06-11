@@ -1,4 +1,9 @@
-from sense_hat import SenseHat
+import platform
+
+if platform.machine() == 'x86_64':
+    from sense_emu import SenseHat
+else:
+    from sense_hat import SenseHat
 
 
 SCROLL_SPEED = 0.04
@@ -12,6 +17,7 @@ colors = {
             'pink':    (255, 105, 180)
         }
 
+
 class Tile:
     @property
     def coords(self):
@@ -19,10 +25,12 @@ class Tile:
         y = (self.nb // 3) * 3
         return {(x, y), (x + 1, y), (x, y + 1), (x + 1, y + 1)}
 
+
 class GameTile(Tile):
     def __init__(self, nb):
         self.nb = nb
         self.color = colors['blank']
+
 
 class Cursor(Tile):
     def __init__(self, color):
@@ -48,7 +56,8 @@ class Cursor(Tile):
             nb = self.nb + 1
             if nb not in {3, 6, 9}:
                 self.nb = nb
-         
+
+
 class Grid():
     def __init__(self, color):
         self.color = color
@@ -87,9 +96,9 @@ class Player:
 
     def has_win(self):
         tile_numbers = {tile.nb for tile in self.tiles}
-        win_combinations = [{0, 3, 6}, {1, 4, 7}, {2, 5, 8}, # rows
-                            {0, 1, 2}, {3, 4 ,5}, {6, 7 ,8}, # columns
-                            {0, 4, 8}, {2, 4, 6}] # diagonales
+        win_combinations = [{0, 3, 6}, {1, 4, 7}, {2, 5, 8},  # rows
+                            {0, 1, 2}, {3, 4, 5}, {6, 7, 8},  # columns
+                            {0, 4, 8}, {2, 4, 6}]  # diagonales
         return any(combi.issubset(tile_numbers) for combi in win_combinations)
 
 
@@ -124,7 +133,7 @@ class Game:
     def turn(self):
         nb_used_tiles = len(self.players[0].tiles) + len(self.players[1].tiles)
         return nb_used_tiles
-    
+
     def refresh(self):
         for tile in self.tiles:
             self._draw_tile(tile)
@@ -190,6 +199,7 @@ class Game:
                  text_colour=colors['white'],
                  scroll_speed=SCROLL_SPEED
             )
+
     def loose_msg(self):
         self.sense.show_message(
                 "You loose!",
