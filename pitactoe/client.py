@@ -4,7 +4,7 @@ from .core import Game
 
 
 def connect(host, port=47878):
-    game = Game(1)
+    game = Game()
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.connect((host, port))
 

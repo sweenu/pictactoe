@@ -1,0 +1,19 @@
+[tool.poetry]
+name = "pictactoe"
+version = "0.1.0"
+description = "A tic-tac-toe for the Raspberry Pi with the sense hat"
+authors = ["Bruno Inec <brunoinec@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.5"
+sense-hat = "^2.2.0"
+RTIMULib = "^7.2.1"
+
+[tool.poetry.dev-dependencies]
+sense-emu = "^1.1"
+PyGObject = "^3.38.0"
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"

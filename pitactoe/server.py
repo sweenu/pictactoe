@@ -3,8 +3,8 @@ import socket
 from .core import Game
 
 
-def serve(host='', port=47878):
-    game = Game(0)
+def serve(host="", port=47878):
+    game = Game()
     with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
         s.bind((host, port))
         s.listen(1)

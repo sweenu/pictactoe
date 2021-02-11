@@ -1,6 +1,6 @@
 import platform
 
-if platform.machine() == 'x86_64':
+if platform.machine() == "x86_64":
     from sense_emu import SenseHat
 else:
     from sense_hat import SenseHat
@@ -8,14 +8,14 @@ else:
 
 SCROLL_SPEED = 0.04
 colors = {
-            'blank':   (0,   0,   0),
-            'white':   (255, 255, 255),
-            'red':     (255, 0,   0),
-            'green':   (0,   255, 0),
-            'blue':    (0,   0,   255),
-            'yellow':  (255, 255, 0),
-            'pink':    (255, 105, 180)
-        }
+    "blank": (0, 0, 0),
+    "white": (255, 255, 255),
+    "red": (255, 0, 0),
+    "green": (0, 255, 0),
+    "blue": (0, 0, 255),
+    "yellow": (255, 255, 0),
+    "pink": (255, 105, 180),
+}
 
 
 class Tile:
@@ -29,7 +29,7 @@ class Tile:
 class GameTile(Tile):
     def __init__(self, nb):
         self.nb = nb
-        self.color = colors['blank']
+        self.color = colors["blank"]
 
 
 class Cursor(Tile):
@@ -40,29 +40,31 @@ class Cursor(Tile):
         self.nb = nb
 
     def move(self, direction):
-        if direction == 'up':
+        if direction == "up":
             nb = self.nb - 3
             if not nb < 0:
                 self.nb = nb
-        elif direction == 'down':
+        elif direction == "down":
             nb = self.nb + 3
             if not nb > 8:
                 self.nb = nb
-        elif direction == 'left':
+        elif direction == "left":
             nb = self.nb - 1
             if nb not in {-1, 2, 5}:
                 self.nb = nb
-        elif direction == 'right':
+        elif direction == "right":
             nb = self.nb + 1
             if nb not in {3, 6, 9}:
                 self.nb = nb
 
 
-class Grid():
+class Grid:
     def __init__(self, color):
         self.color = color
         X = self.color
-        O = colors['blank']
+        O = colors["blank"]
+
+        # fmt: off
         self._grid = [
             O, O, X, O, O, X, O, O,
             O, O, X, O, O, X, O, O,
@@ -73,6 +75,7 @@ class Grid():
             O, O, X, O, O, X, O, O,
             O, O, X, O, O, X, O, O,
         ]
+        # fmt: on
 
     def __iter__(self):
         for led in self._grid:
@@ -96,28 +99,33 @@ class Player:
 
     def has_win(self):
         tile_numbers = {tile.nb for tile in self.tiles}
-        win_combinations = [{0, 3, 6}, {1, 4, 7}, {2, 5, 8},  # rows
-                            {0, 1, 2}, {3, 4, 5}, {6, 7, 8},  # columns
-                            {0, 4, 8}, {2, 4, 6}]  # diagonales
+        win_combinations = [
+            {0, 3, 6},
+            {1, 4, 7},
+            {2, 5, 8},  # rows
+            {0, 1, 2},
+            {3, 4, 5},
+            {6, 7, 8},  # columns
+            {0, 4, 8},
+            {2, 4, 6},
+        ]  # diagonales
         return any(combi.issubset(tile_numbers) for combi in win_combinations)
 
 
 class Game:
-    def __init__(self, player_nb):
+    def __init__(self):
         self.sense = SenseHat()
         self.sense.low_light = True
 
         self.intro_msg()
 
-        self.grid = Grid(colors['white'])
+        self.grid = Grid(colors["white"])
         self.sense.set_pixels(self.grid)
 
-        self.cursor = Cursor(colors['pink'])
+        self.cursor = Cursor(colors["pink"])
         self.tiles = [GameTile(i) for i in range(9)]
 
-        self.player_nb = player_nb
-
-        self.players = [Player(colors['blue']), Player(colors['red'])]
+        self.players = [Player(colors["blue"]), Player(colors["red"])]
 
     @property
     def current_player(self):
@@ -127,7 +135,7 @@ class Game:
     @property
     def other_player(self):
         nb = self.turn % 2
-        return self.players[nb^1]
+        return self.players[nb ^ 1]
 
     @property
     def turn(self):
@@ -147,15 +155,17 @@ class Game:
         self._draw_tile(self.cursor)
         while True:
             event = self.sense.stick.wait_for_event()
-            if event.action == 'pressed':
-                if not event.direction == 'middle':
+            if event.action == "pressed":
+                if not event.direction == "middle":
                     self.cursor.move(event.direction)
                     self.refresh()
                     self._draw_tile(self.cursor)
                 else:
                     selected_tile = self.tiles[self.cursor.nb]
-                    if selected_tile.color == colors['blank']:
-                        self.current_player.play(selected_tile) # the turn is incremented here
+                    if selected_tile.color == colors["blank"]:
+                        self.current_player.play(
+                            selected_tile
+                        )  # the turn is incremented here
                         if self.turn > 3:
                             if self.other_player.has_win():
                                 socket.sendall(bytes([9]))
@@ -170,7 +180,7 @@ class Game:
         while True:
             data = socket.recv(1024)
             if data:
-                tile_nb = int.from_bytes(data, 'little')
+                tile_nb = int.from_bytes(data, "little")
                 if tile_nb == 9:
                     self.loose_msg()
                     return True
@@ -181,28 +191,22 @@ class Game:
 
     def intro_msg(self):
         self.sense.show_message(
-                "Welcome to pytactoe!!",
-                text_colour=colors['white'],
-                scroll_speed=SCROLL_SPEED,
-            )
+            "Welcome to pitactoe!!",
+            text_colour=colors["white"],
+            scroll_speed=SCROLL_SPEED,
+        )
 
     def draw_msg(self):
         self.sense.show_message(
-                "Draw!",
-                 text_colour=colors['white'],
-                 scroll_speed=SCROLL_SPEED
-            )
+            "Draw!", text_colour=colors["white"], scroll_speed=SCROLL_SPEED
+        )
 
     def win_msg(self):
         self.sense.show_message(
-                "You win!",
-                 text_colour=colors['white'],
-                 scroll_speed=SCROLL_SPEED
-            )
+            "You win!", text_colour=colors["white"], scroll_speed=SCROLL_SPEED
+        )
 
     def loose_msg(self):
         self.sense.show_message(
-                "You loose!",
-                 text_colour=colors['white'],
-                 scroll_speed=SCROLL_SPEED
-            )
+            "You loose!", text_colour=colors["white"], scroll_speed=SCROLL_SPEED
+        )
